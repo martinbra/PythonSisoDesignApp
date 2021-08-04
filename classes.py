@@ -152,7 +152,7 @@ class PoleOrZeroClass():
       print('Gc should not have more zeros than poles. First set the poles.')
 
   def set_button_changes_status(self,dict_observe):
-    '''Changes the relative order or the controller '''
+    """Changes the relative order or the controller"""
     oldStatus, newStatus = dict_observe['old'], dict_observe['new']
     if newStatus == 'success':
       PoleOrZeroClass.relatOrderC +=  self.d_relatOrd[self.oldPZType]  #increases relat orde
@@ -160,7 +160,7 @@ class PoleOrZeroClass():
       PoleOrZeroClass.relatOrderC -=  self.d_relatOrd[self.oldPZType]  #removes relat order
 
   def show_update_tf_text(self):
-    '''Runs always when anything changes'''
+    """Runs always when anything changes"""
     from numpy import pi, exp, cos, sqrt, array
     w, csi = 2*pi*self.Fwgt.value,  self.CSIwgt.value
     if self.Ts in [0, None]:   #continuous-time system
@@ -264,7 +264,7 @@ class ControllerSISOApp(TransferFunction):
     return Math(latex_raw_equation)
 
   def _init_PZwidgets_by_given_controller(self):
-    '''Inits the PZwidgets by a given controller'''
+    """Inits the PZwidgets by a given controller"""
     from numpy import abs, real, imag, pi
     from control import mag2db, db2mag
     assert (len(self.Poles)+len(self.Zeros)<=len(self.PZwidgets)), 'Increase variable "quantity_PZs".'
@@ -304,8 +304,8 @@ class ControllerSISOApp(TransferFunction):
     #self.set_PZs_from_PZwidgets(0)
 
   def set_PZs_from_PZwidgets(self, button_style):
-    '''Runs when the "Set" Buttons change
-       Sets the controller by pulling data from the PZ widgets'''
+    """Runs when the "Set" Buttons change
+       Sets the controller by pulling data from the PZ widgets"""
     if button_style['new']=='success':
       #Here inserts all poles and zeros with 'success'
       notcompletePZs = [ (self.PZwidgets[q].ENwgt.value ^ (self.PZwidgets[q].SETwgt.button_style=='success')) for q in range(len(self.PZwidgets))]
@@ -365,15 +365,15 @@ class ControllerSISOApp(TransferFunction):
     super().__init__(self.Kdcgain*self.num_norm , self.den_norm, self.dt)
 
   def _update_relatOrder(self):
-    '''After updating  self.Zeros and self.Poles'''
+    """After updating  self.Zeros and self.Poles"""
     self.relatOrderC = len(self.Poles)-len(self.Zeros)
     PoleOrZeroClass.relatOrderC = self.relatOrderC
     assert self.relatOrderC>=0, 'Gc should not have more zeros than poles.'
   
   def _update_SPoles_SZeros(self):
-    '''After updating  self.Zeros and self.Poles
-      SPoles and SZeros are in rad/s
-    '''
+    """After updating  self.Zeros and self.Poles
+       SPoles and SZeros are in rad/s
+    """
     from numpy import seterr, log, round, real
     seterr(divide = 'ignore', invalid = 'ignore')
     self.SPoles = self.Poles if self.dt in [0,None] else round(log(self.Poles)/self.dt,6)  #z = exp(s*Ts)
@@ -383,7 +383,7 @@ class ControllerSISOApp(TransferFunction):
     #assert all(real(self.SZeros)<=0), 'Gc(s) should not have non minimum phase zeros.'
 
   def _update_num_norm_den_norm(self):
-    '''After updating  self.Zeros and self.Poles'''
+    """After updating  self.Zeros and self.Poles"""
     from numpy import abs, array, flipud, round, convolve, sum, real
     from numpy.polynomial.polynomial import polyfromroots
     p_integrator = 0 if self.dt in [None, 0.0] else 1.0
@@ -408,7 +408,7 @@ class ControllerSISOApp(TransferFunction):
     self.den_norm = real(round(convolve(den_filt, den_int),12))
 
   def _update_Kdcgain(self):
-    '''Works only after running "update_num_norm_den_norm" '''
+    """Works only after running "update_num_norm_den_norm" """
     from scipy.signal import tf2zpk
     from numpy import real, round
     _,_,k1 = tf2zpk(self.num_norm, self.den_norm)
@@ -452,7 +452,7 @@ class DisturbancesWidget():
                'square': '"Amplitude" is set at given "time" points.',
              'triangle': '"Amplitude" is set at given "time" points.',
                   'PWL': 'Piecewise Linear Function: set "time" and "amplitude" points.',
-                'P-PWL': 'Peridic Piecewise Linear Function: set "time" and "amplitude" points. Period = last "Time point".',
+                'P-PWL': 'Periodic Piecewise Linear Function: set "time" and "amplitude" points. Period = last "Time point".',
                 'noise': '"Amplitude points" is the standard deviation.   "Freq (Hz)": BandWidth for 1st order LPF. '}
   def __init__(self, tmax_s = 10, dt_s = 1e-3, freq0_Hz = 1):
     from numpy import array, arange, zeros_like
@@ -719,7 +719,7 @@ class ControlAnalysisWidget():
       self.SETAllButton.button_style = ''
   
   def set_disturbs_to_SisoApp(self, button_style):
-    '''When Set All Button is turned on '''
+    """When Set All Button is turned on """
     if button_style['new']=='success':
         from numpy import array, concatenate, zeros_like, real
         tvec = real(self.DistWgts[0].timeVec_s)
@@ -758,7 +758,7 @@ import numpy as np
 import bokeh
  
 class SISOApp:
-  '''
+  """
   Class of SISO Design Python Application
       Control package:   import control.matlab as *
       GUI:  ipywidgets + Bokeh
@@ -780,7 +780,7 @@ class SISOApp:
            └────────[Gf]←─────────────◯+←───┘ 
 
       Open Loop Transfer Function:  T(s) = Gc*Gp*Gf
-  '''
+  """
  
   def __init__(self, Gp, Gc=None, Gf=None, quantity_PZs = 4):
     """Gp: plant transfer function (Python Control Package);
@@ -1123,13 +1123,13 @@ class SISOApp:
     sys = append(self.Gc, self.Gp, tf(1,1,self.dt), self.Gf)
     # r-->[Gc: 1]--u-->[Gp: 2]--->[dy_sum: 3]--y-->[Gf: 4]
     self.sysMF = connect(sys, Q = [[2, 1], [3, 2], [4, 3], [1,-4]], # Q: [inputNbr, outputNbr]
-                         inputv = [1, 2, 3, 4], outputv = [3, 1]) #Inputs: r, du, dy, dm. Ouputs: y, u
+                         inputv = [1, 2, 3, 4], outputv = [3, 1]) #Inputs: r, du, dy, dm. Outputs: y, u
 
   def _clamp_fNyquist(self,SPoles_SZeros):
     return np.clip(np.abs(SPoles_SZeros), 0, 2*np.pi*self.fNyquistHz)
 
   def createBode(self):
-    '''Creates the plots for Bode Diagram '''
+    """Creates the plots for Bode Diagram"""
     from control.matlab import bode, mag2db
     R2D,  W2F = 180/np.pi,  1/(2*np.pi)
     magT,phiT,omega = bode(self.OLTF,omega_num=1000, plot=False)
